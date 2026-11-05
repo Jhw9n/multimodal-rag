@@ -1,0 +1,20 @@
+# requirements.txt — 멀티모달 RAG 실습 (Python 3.11 권장)
+langchain>=1.0
+langchain-classic>=1.0  # MultiVectorRetriever. langchain 1.x에서 분리됨 (필수)
+langchain-openai
+langchain-community
+langchain-chroma
+langchain-experimental
+langchain-ollama
+langchain-text-splitters  # 노트북에서 직접 import
+unstructured[all-docs]
+pillow
+pydantic
+lxml
+matplotlib
+chromadb
+tiktoken
+python-dotenv
+requests  # 노트북에서 직접 import (LLaVA 호출)
+ipykernel
+jupyterlab
