@@ -1,0 +1,45 @@
+flowchart TB
+    PDF["PDF 본문 22쪽<br/>(HRI 경제주평 26-10)"]
+
+    subgraph S1["① 문서 데이터 파싱"]
+        direction TB
+        P["Unstructured partition_pdf<br/>strategy = hi_res"]
+        T["텍스트 블록<br/>2000토큰 분할 · 겹침 200"]
+        TB["표"]
+        IM["그래프 이미지 .jpg<br/>base64 변환"]
+        SUM["요약 생성 gpt-4o-mini<br/>텍스트 · 표 · 이미지(비전)"]
+        ORI["원본 묶음<br/>텍스트 · 표 · base64 이미지"]
+        P --> T
+        P --> TB
+        P --> IM
+        T --> SUM
+        TB --> SUM
+        IM --> SUM
+        T --> ORI
+        TB --> ORI
+        IM --> ORI
+    end
+
+    subgraph S2["② 데이터 저장 및 검색"]
+        direction TB
+        Q(["사용자 질문"])
+        VDB[("Chroma 벡터 DB<br/>요약 임베딩 = 색인 카드")]
+        DOC[("InMemoryStore<br/>원본 = 서가")]
+        RET["MultiVectorRetriever<br/>같은 doc_id로 연결<br/>요약으로 검색 → 원본 반환"]
+        Q --> RET
+        VDB --> RET
+        DOC --> RET
+    end
+
+    subgraph S3["③ 답변 생성"]
+        direction TB
+        SPLIT["검색된 원본을<br/>이미지 / 텍스트로 분리"]
+        LLM["gpt-4o-mini 멀티모달<br/>원본 이미지 + 원본 텍스트·표 + 질문"]
+        ANS["한국어 답변"]
+        SPLIT --> LLM --> ANS
+    end
+
+    PDF --> P
+    SUM -- "요약 임베딩" --> VDB
+    ORI -- "같은 doc_id로 저장" --> DOC
+    RET --> SPLIT
